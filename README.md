@@ -3,6 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/rustapi.svg?logo=pypi&logoColor=white&cache=1)](https://pypi.org/project/rustapi/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/rustapi.svg?logo=python&logoColor=white&cache=1)](https://pypi.org/project/rustapi/)
 [![PyPI platforms](https://img.shields.io/pypi/wheel/rustapi.svg?cache=1)](https://pypi.org/project/rustapi/#files)
+[![Support us](https://img.shields.io/badge/Support_us-with_a_⭐️-yellow.svg)](https://github.com/Piyush4u/rustapi/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Piyush4u/rustapi#license)
 [![CI](https://github.com/Piyush4u/rustapi/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Piyush4u/rustapi/actions/workflows/ci.yml)
 [![Release](https://github.com/Piyush4u/rustapi/actions/workflows/release.yml/badge.svg)](https://github.com/Piyush4u/rustapi/actions/workflows/release.yml)
@@ -10,6 +11,12 @@
 [![Changelog](https://img.shields.io/badge/changelog-Keep%20a%20Changelog-blue.svg)](CHANGELOG.md)
 
 A Rust-core Python web framework. Hot paths in Rust, business logic in Python.
+
+<p align="center">
+  <img src="docs/benchmark.svg" alt="RustAPI Benchmark" />
+</p>
+
+<!-- [PLACEHOLDER for 10-second GIF: Record a terminal session using `vhs` or `Terminalizer` showing `pip install rustapi`, writing a 5 line server, and curling it] -->
 
 > **Status:** Alpha. This is a foundational MVP demonstrating the architecture
 > thesis — a Rust-native HTTP engine exposed through a Python decorator API

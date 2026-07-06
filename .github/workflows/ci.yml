@@ -88,15 +88,15 @@ jobs:
         run: pip install maturin
 
       - name: Build & install (dev mode)
-        run: maturin develop --release
+        run: python -m venv .venv && source .venv/bin/activate && maturin develop --release
 
       - name: Run e2e tests
-        run: python tests/test_e2e.py
+        run: source .venv/bin/activate && python tests/test_e2e.py
 
       - name: Run perf smoke test (3.12 only)
         if: matrix.python-version == '3.12'
         run: |
-          pip install aiohttp
+          source .venv/bin/activate && pip install aiohttp
           python tests/test_perf_async.py
 
   # ----------------------------------------------------------------------

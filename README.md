@@ -1,8 +1,8 @@
 # rustapi
 
-[![PyPI version](https://img.shields.io/pypi/v/rustapi.svg?logo=pypi&logoColor=white)](https://pypi.org/project/rustapi/)
-[![PyPI pyversions](https://img.shields.io/pypi/pyversions/rustapi.svg?logo=python&logoColor=white)](https://pypi.org/project/rustapi/)
-[![PyPI platforms](https://img.shields.io/pypi/wheel/rustapi.svg)](https://pypi.org/project/rustapi/#files)
+[![PyPI version](https://img.shields.io/pypi/v/rustapi.svg?logo=pypi&logoColor=white&cache=1)](https://pypi.org/project/rustapi/)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/rustapi.svg?logo=python&logoColor=white&cache=1)](https://pypi.org/project/rustapi/)
+[![PyPI platforms](https://img.shields.io/pypi/wheel/rustapi.svg?cache=1)](https://pypi.org/project/rustapi/#files)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Piyush4u/rustapi#license)
 [![CI](https://github.com/Piyush4u/rustapi/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Piyush4u/rustapi/actions/workflows/ci.yml)
 [![Release](https://github.com/Piyush4u/rustapi/actions/workflows/release.yml/badge.svg)](https://github.com/Piyush4u/rustapi/actions/workflows/release.yml)

@@ -3,10 +3,10 @@
 [![PyPI version](https://img.shields.io/pypi/v/rustapi.svg?logo=pypi&logoColor=white)](https://pypi.org/project/rustapi/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/rustapi.svg?logo=python&logoColor=white)](https://pypi.org/project/rustapi/)
 [![PyPI platforms](https://img.shields.io/pypi/wheel/rustapi.svg)](https://pypi.org/project/rustapi/#files)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/rustapi/rustapi#license)
-[![CI](https://github.com/rustapi/rustapi/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/rustapi/rustapi/actions/workflows/ci.yml)
-[![Release](https://github.com/rustapi/rustapi/actions/workflows/release.yml/badge.svg)](https://github.com/rustapi/rustapi/actions/workflows/release.yml)
-[![Documentation](https://img.shields.io/badge/docs-README-blue.svg)](https://github.com/rustapi/rustapi#readme)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Piyush4u/rustapi#license)
+[![CI](https://github.com/Piyush4u/rustapi/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Piyush4u/rustapi/actions/workflows/ci.yml)
+[![Release](https://github.com/Piyush4u/rustapi/actions/workflows/release.yml/badge.svg)](https://github.com/Piyush4u/rustapi/actions/workflows/release.yml)
+[![Documentation](https://img.shields.io/badge/docs-README-blue.svg)](https://github.com/Piyush4u/rustapi#readme)
 [![Changelog](https://img.shields.io/badge/changelog-Keep%20a%20Changelog-blue.svg)](CHANGELOG.md)
 
 A Rust-core Python web framework. Hot paths in Rust, business logic in Python.
@@ -25,7 +25,7 @@ pip install rustapi
 For local development:
 
 ```bash
-git clone https://github.com/rustapi/rustapi
+git clone https://github.com/Piyush4u/rustapi
 cd rustapi
 maturin develop --release
 ```

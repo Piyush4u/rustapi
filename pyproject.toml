@@ -46,12 +46,12 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rustapi/rustapi"
-Repository = "https://github.com/rustapi/rustapi"
-Documentation = "https://github.com/rustapi/rustapi#readme"
-Changelog = "https://github.com/rustapi/rustapi/blob/main/CHANGELOG.md"
-Issues = "https://github.com/rustapi/rustapi/issues"
-Funding = "https://github.com/sponsors/rustapi"
+Homepage = "https://github.com/Piyush4u/rustapi"
+Repository = "https://github.com/Piyush4u/rustapi"
+Documentation = "https://github.com/Piyush4u/rustapi#readme"
+Changelog = "https://github.com/Piyush4u/rustapi/blob/main/CHANGELOG.md"
+Issues = "https://github.com/Piyush4u/rustapi/issues"
+Funding = "https://github.com/sponsors/Piyush4u"
 
 [tool.maturin]
 # The Rust crate that builds the Python extension (workspace member).

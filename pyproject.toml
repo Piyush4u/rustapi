@@ -1,0 +1,96 @@
+[build-system]
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "rustapi"
+version = "0.1.0"
+description = "A Rust-core Python web framework. Hot paths in Rust, business logic in Python."
+readme = "README.md"
+license = { text = "MIT OR Apache-2.0" }
+requires-python = ">=3.8"
+authors = [{ name = "rustapi contributors" }]
+keywords = [
+    "web",
+    "framework",
+    "asyncio",
+    "rust",
+    "pyo3",
+    "http",
+    "hyper",
+    "tokio",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Rust",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: System :: Networking",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/rustapi/rustapi"
+Repository = "https://github.com/rustapi/rustapi"
+Documentation = "https://github.com/rustapi/rustapi#readme"
+Changelog = "https://github.com/rustapi/rustapi/blob/main/CHANGELOG.md"
+Issues = "https://github.com/rustapi/rustapi/issues"
+Funding = "https://github.com/sponsors/rustapi"
+
+[tool.maturin]
+# The Rust crate that builds the Python extension (workspace member).
+manifest-path = "crates/rustapi-py/Cargo.toml"
+# Pure-Python package files to ship alongside the extension module.
+python-source = "python"
+# Include the pure-Python package + type marker.
+python-packages = ["rustapi"]
+# `extension-module` avoids linking libpython on Unix.
+features = ["pyo3/extension-module"]
+module-name = "rustapi._rustapi"
+# Strip debug symbols from the release binary for smaller wheels.
+strip = true
+# Include the licenses and README in the sdist.
+include = [
+    { path = "LICENSE-MIT", format = "sdist" },
+    { path = "LICENSE-APACHE", format = "sdist" },
+    { path = "CHANGELOG.md", format = "sdist" },
+    { path = "docs/**/*", format = "sdist" },
+    { path = "examples/**/*", format = "sdist" },
+    { path = "tests/**/*", format = "sdist" },
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP"]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.mypy]
+python_version = "3.8"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+# Allow missing stubs for the native module — we ship our own .pyi in v0.2.
+[[tool.mypy.overrides]]
+module = ["rustapi._rustapi"]
+ignore_missing_imports = true

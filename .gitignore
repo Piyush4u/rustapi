@@ -1,0 +1,86 @@
+# Rust
+/target
+**/target
+**/*.rs.bk
+Cargo.lock.bak
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv
+venv
+env/
+ENV/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# Build artifacts
+*.whl
+*.tar.gz
+dist/
+build/
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Per-test scratch files
+tests/_launcher.py
+tests/_perf_app.py
+tests/_perf_async_app.py
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+PUBLISHING.md

@@ -1,0 +1,24 @@
+[package]
+name = "rustapi-py"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "PyO3 bindings exposing the rustapi engine to Python"
+
+[lib]
+name = "_rustapi"
+crate-type = ["cdylib"]
+
+[dependencies]
+rustapi-engine = { path = "../rustapi-engine" }
+tokio = { workspace = true }
+hyper = { workspace = true }
+bytes = { workspace = true }
+http = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+pyo3 = { workspace = true }
+pyo3-async-runtimes = { workspace = true }

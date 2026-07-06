@@ -1,0 +1,185 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to publish (must already exist in the repo)"
+        required: true
+        type: string
+
+# One release job at a time per tag.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # ----------------------------------------------------------------------
+  # Build wheels for every supported platform.
+  # PyO3 abi3-py38 means ONE wheel works on CPython 3.8 through 3.13+
+  # — no per-Python-version matrix needed.
+  # ----------------------------------------------------------------------
+  build:
+    name: Build wheel (${{ matrix.target.os }}/${{ matrix.target.arch }})
+    runs-on: ${{ matrix.target.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          # Linux — manylinux_2_28 covers glibc 2.28+ (CentOS 8+, Ubuntu 18.04+)
+          - { os: linux, arch: x86_64, runner: ubuntu-latest, target: x86_64-unknown-linux-gnu, manylinux: manylinux_2_28 }
+          - { os: linux, arch: aarch64, runner: ubuntu-latest, target: aarch64-unknown-linux-gnu, manylinux: manylinux_2_28 }
+          # Linux musl — for Alpine
+          - { os: linux-musl, arch: x86_64, runner: ubuntu-latest, target: x86_64-unknown-linux-musl, manylinux: musllinux_2_28 }
+          # macOS universal2 (single wheel for x86_64 + aarch64)
+          - { os: macos, arch: universal2, runner: macos-12, target: universal2-apple-darwin, manylinux: "" }
+          # Windows
+          - { os: windows, arch: x86_64, runner: windows-latest, target: x86_64-pc-windows-msvc, manylinux: "" }
+          - { os: windows, arch: aarch64, runner: windows-latest, target: aarch64-pc-windows-msvc, manylinux: "" }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target.target }}
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build wheel
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target.target }}
+          args: --release --out dist
+          manylinux: ${{ matrix.target.manylinux }}
+          # Build the abi3 wheel — one wheel for all CPython 3.8+ versions.
+          # Maturin reads the abi3-py38 feature from pyproject.toml.
+          before-script-linux: |
+            # No-op for manylinux; maturin-action handles the toolchain.
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.target.os }}-${{ matrix.target.arch }}
+          path: dist/*
+
+  # ----------------------------------------------------------------------
+  # Build the source distribution (sdist).
+  # ----------------------------------------------------------------------
+  sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build sdist
+        uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*
+
+  # ----------------------------------------------------------------------
+  # Publish to PyPI using Trusted Publishing (OIDC).
+  # No API tokens required — configured at
+  # https://pypi.org/manage/account/publishing/
+  #
+  # Setup steps (one-time, by a maintainer with PyPI access):
+  #   1. Create the project on PyPI: https://pypi.org/manage/projects/
+  #   2. Add a Trusted Publisher:
+  #        PyPI Project Settings → Publishing → Add a publisher
+  #        - PyPI Project Name: rustapi
+  #        - Owner: rustapi
+  #        - Repo: rustapi
+  #        - Workflow filename: release.yml
+  #        - Environment name: pypi
+  # ----------------------------------------------------------------------
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [build, sdist]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/rustapi/
+    # Trusted Publishing requires `id-token: write`.
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # No `password:` — uses Trusted Publishing (OIDC).
+
+  # ----------------------------------------------------------------------
+  # Publish to TestPyPI on tag pushes that look like pre-releases
+  # (e.g. v0.2.0rc1, v0.2.0a1). Lets us sanity-check before going live.
+  # ----------------------------------------------------------------------
+  publish-testpypi:
+    name: Publish to TestPyPI (pre-releases)
+    if: contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc')
+    needs: [build, sdist]
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/rustapi/
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  # ----------------------------------------------------------------------
+  # GitHub Release: attach the wheels + sdist + auto-generated notes.
+  # ----------------------------------------------------------------------
+  github-release:
+    name: GitHub Release
+    needs: [build, sdist]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc') }}

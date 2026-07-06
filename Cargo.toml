@@ -1,0 +1,48 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/rustapi-engine",
+    "crates/rustapi-py",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["rustapi contributors"]
+repository = "https://github.com/rustapi/rustapi"
+description = "A Rust-core Python web framework. Hot paths in Rust, business logic in Python."
+readme = "README.md"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+# HTTP
+hyper = { version = "1", features = ["full"] }
+hyper-util = { version = "0.1", features = ["full"] }
+http = "1"
+http-body-util = "0.1"
+bytes = "1"
+# Routing
+matchit = "0.8"
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# PyO3 — Python bindings. `extension-module` makes the crate produce a
+# Python extension; `abi3-py38` means one wheel works on CPython 3.8+.
+pyo3 = { version = "0.29", features = ["extension-module", "abi3-py38"] }
+# `pyo3-async-runtimes` is the successor to `pyo3-asyncio`; it bridges Python
+# coroutines to Rust futures on a tokio runtime.
+pyo3-async-runtimes = { version = "0.29", features = ["tokio-runtime"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+
+[profile.bench]
+inherits = "release"

@@ -1,0 +1,148 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+  RUST_BACKTRACE: 1
+
+jobs:
+  # ----------------------------------------------------------------------
+  # Rust: fmt + clippy + unit tests
+  # ----------------------------------------------------------------------
+  rust-checks:
+    name: Rust fmt + clippy + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo fmt
+        run: cargo fmt --all -- --check
+
+      - name: cargo clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: cargo test
+        run: cargo test --workspace --no-fail-fast
+
+  # ----------------------------------------------------------------------
+  # Rust: audit dependencies for known CVEs
+  # ----------------------------------------------------------------------
+  rust-audit:
+    name: cargo audit
+    runs-on: ubuntu-latest
+    # Allow audit failures to be reviewed without blocking PR merges.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+      - name: cargo audit
+        run: cargo audit --deny warnings
+
+  # ----------------------------------------------------------------------
+  # Python: build extension, install, run e2e tests
+  # ----------------------------------------------------------------------
+  python-tests:
+    name: Python e2e (CPython ${{ matrix.python-version }})
+    needs: rust-checks
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # abi3-py38 means one wheel works on 3.8 through 3.13+. We test on
+        # the range we claim to support.
+        python-version: ["3.8", "3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install maturin
+        run: pip install maturin
+
+      - name: Build & install (dev mode)
+        run: maturin develop --release
+
+      - name: Run e2e tests
+        run: python tests/test_e2e.py
+
+      - name: Run perf smoke test (3.12 only)
+        if: matrix.python-version == '3.12'
+        run: |
+          pip install aiohttp
+          python tests/test_perf_async.py
+
+  # ----------------------------------------------------------------------
+  # Python: lint
+  # ----------------------------------------------------------------------
+  python-lint:
+    name: Python ruff + mypy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install ruff + mypy
+        run: pip install ruff mypy
+      - name: ruff check
+        run: ruff check python/ examples/ tests/
+      - name: ruff format --check
+        run: ruff format --check python/ examples/ tests/
+
+  # ----------------------------------------------------------------------
+  # Build smoke: verify sdist + wheel build cleanly
+  # ----------------------------------------------------------------------
+  build-smoke:
+    name: Build sdist + wheel
+    needs: rust-checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install build tools
+        run: pip install maturin twine
+      - name: Build sdist + wheel
+        run: maturin build --release --out dist
+      - name: twine check
+        run: twine check dist/*
+      - name: List artifacts
+        run: ls -la dist/
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-linux-x86_64
+          path: dist/*

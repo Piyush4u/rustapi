@@ -7,7 +7,7 @@ name = "rustapi"
 version = "0.1.7"
 description = "A Rust-core Python web framework. Hot paths in Rust, business logic in Python."
 readme = "README.md"
-license = { text = "MIT OR Apache-2.0" }
+license = { text = "MIT" }
 requires-python = ">=3.8"
 authors = [{ name = "rustapi contributors" }]
 keywords = [
@@ -25,7 +25,6 @@ classifiers = [
     "Framework :: AsyncIO",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
@@ -69,7 +68,6 @@ strip = true
 # Include the licenses and README in the sdist.
 include = [
     { path = "LICENSE-MIT", format = "sdist" },
-    { path = "LICENSE-APACHE", format = "sdist" },
     { path = "CHANGELOG.md", format = "sdist" },
     { path = "docs/**/*", format = "sdist" },
     { path = "examples/**/*", format = "sdist" },

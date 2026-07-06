@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/rustapi.svg?logo=pypi&logoColor=white)](https://pypi.org/project/rustapi/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/rustapi.svg?logo=python&logoColor=white)](https://pypi.org/project/rustapi/)
 [![PyPI platforms](https://img.shields.io/pypi/wheel/rustapi.svg)](https://pypi.org/project/rustapi/#files)
-[![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](https://github.com/rustapi/rustapi#license)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/rustapi/rustapi#license)
 [![CI](https://github.com/rustapi/rustapi/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/rustapi/rustapi/actions/workflows/ci.yml)
 [![Release](https://github.com/rustapi/rustapi/actions/workflows/release.yml/badge.svg)](https://github.com/rustapi/rustapi/actions/workflows/release.yml)
 [![Documentation](https://img.shields.io/badge/docs-README-blue.svg)](https://github.com/rustapi/rustapi#readme)
@@ -116,9 +116,9 @@ See `docs/ROADMAP.md` for the full plan. Highlights:
 
 ## License
 
-Dual-licensed under [MIT](LICENSE-MIT) OR [Apache-2.0](LICENSE-APACHE).
+Licensed under the [MIT License](LICENSE-MIT).
 
-Contributions are accepted under the same dual license unless explicitly
+Contributions are accepted under the same license unless explicitly
 stated otherwise.
 
 ## Contributing

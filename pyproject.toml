@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "rustapi"
-version = "0.1.0"
+version = "0.1.7"
 description = "A Rust-core Python web framework. Hot paths in Rust, business logic in Python."
 readme = "README.md"
 license = { text = "MIT OR Apache-2.0" }

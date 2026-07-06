@@ -60,7 +60,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target.target }}
-          args: --release --out dist
+          args: --release --out dist ${{ matrix.target.manylinux == 'musllinux_2_28' && '--auditwheel=skip' || '' }}
           manylinux: ${{ matrix.target.manylinux }}
           # Build the abi3 wheel — one wheel for all CPython 3.8+ versions.
           # Maturin reads the abi3-py38 feature from pyproject.toml.

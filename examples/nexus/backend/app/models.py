@@ -1,7 +1,9 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
+
 from app.database import Base
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
 
 class User(Base):
     __tablename__ = "users"
@@ -12,15 +14,17 @@ class User(Base):
 
     posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
     comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan")
-    
+
     # Followers implementation: self-referential many-to-many
     # For simplicity in this demo, we'll use a Follower model
+
 
 class Follow(Base):
     __tablename__ = "follows"
     id = Column(Integer, primary_key=True, index=True)
     follower_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     followed_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+
 
 class Post(Base):
     __tablename__ = "posts"
@@ -31,6 +35,7 @@ class Post(Base):
 
     author = relationship("User", back_populates="posts")
     comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
+
 
 class Comment(Base):
     __tablename__ = "comments"

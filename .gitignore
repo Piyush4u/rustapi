@@ -1,27 +1,37 @@
 ```
-# Rust/Cargo
-target/
-Cargo.lock
-**/*.rs.bk
-
 # Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
-env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
 venv/
 .venv/
-.ENV
-.ENV.*
-.venv.bak/
-.conda/
-.mypy_cache/
-.pytest_cache/
-.coverage
-htmlcov/
-.coverage.*
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # Logs
 *.log
@@ -29,25 +39,26 @@ htmlcov/
 # Environment
 .env
 .env.local
-.env.*
-.env.local.*
+*.env.*
 
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
+# Coverage
+.coverage
+coverage/
+htmlcov/
 
-# OS
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pytest
+.pytest_cache/
+
+# Rust build artifacts (if applicable)
+target/
+Cargo.lock
+
+# System
 .DS_Store
 Thumbs.db
-
-# Build artifacts
-dist/
-build/
-*.so
-*.dylib
-*.dll
-*.exe
-*.out
 ```

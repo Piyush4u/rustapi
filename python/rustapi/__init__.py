@@ -11,9 +11,9 @@ modern developer experience. Features:
 - simd-json for 3-10x faster JSON operations
 """
 
-from typing import Any, Callable, Dict, List, Optional, TypeVar, Union, get_type_hints
-from functools import wraps
 import inspect
+from functools import wraps
+from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
 
 from ._rustapi import (
     Request,
@@ -47,46 +47,47 @@ F = TypeVar("F", bound=Callable[..., Any])
 # Dependency Injection - FastAPI compatible
 # ============================================================================
 
+
 class Dependant:
     """Internal representation of a dependency."""
-    
+
     def __init__(self, call: Callable, use_cache: bool = True):
         self.call = call
         self.use_cache = use_cache
-        self.dependencies: List["Dependant"] = []
-        
+        self.dependencies: List[Dependant] = []
+
     def __repr__(self) -> str:
         return f"Dependant({self.call.__name__})"
 
 
 class Depends:
     """FastAPI-compatible dependency injection marker.
-    
+
     Usage:
         async def get_db() -> Database:
             return Database()
-        
+
         @app.get("/users/{id}")
         async def get_user(id: int, db: Database = Depends(get_db)):
             return await db.get_user(id)
     """
-    
+
     def __init__(self, dependency: Optional[Callable] = None, use_cache: bool = True):
         self.dependency = dependency
         self.use_cache = use_cache
-        
+
     def __call__(self) -> Any:
         # This is never actually called at runtime
         return self
-    
+
     def __repr__(self) -> str:
-        dep_name = getattr(self.dependency, '__name__', 'unknown') if self.dependency else 'None'
+        dep_name = getattr(self.dependency, "__name__", "unknown") if self.dependency else "None"
         return f"Depends({dep_name})"
 
 
 class Query:
     """Query parameter with validation."""
-    
+
     def __init__(
         self,
         default: Any = ...,
@@ -117,14 +118,14 @@ class Query:
 
 class Path(Query):
     """Path parameter with validation."""
-    
+
     def __init__(self, default: Any = ..., **kwargs):
         super().__init__(default=default, **kwargs)
 
 
 class Body(Query):
     """Request body parameter with validation."""
-    
+
     def __init__(
         self,
         default: Any = ...,
@@ -140,17 +141,20 @@ class Body(Query):
 
 class Header(Query):
     """Header parameter with validation."""
+
     pass
 
 
 class Cookie(Query):
     """Cookie parameter with validation."""
+
     pass
 
 
 # ============================================================================
 # Response helpers
 # ============================================================================
+
 
 def JsonResponse(
     data: Any,
@@ -174,9 +178,10 @@ def TextResponse(
 # OpenAPI Schema Generator
 # ============================================================================
 
+
 class OpenAPIInfo:
     """OpenAPI specification info."""
-    
+
     def __init__(
         self,
         title: str = "API",
@@ -196,18 +201,18 @@ class OpenAPIInfo:
 
 class OpenAPIGenerator:
     """Automatic OpenAPI 3.1 schema generator."""
-    
+
     def __init__(self, info: OpenAPIInfo):
         self.info = info
         self.paths: Dict[str, Dict] = {}
         self.components: Dict[str, Dict] = {"schemas": {}}
-        
+
     def add_route(self, path: str, method: str, operation: Dict) -> None:
         """Add a route to the OpenAPI spec."""
         if path not in self.paths:
             self.paths[path] = {}
         self.paths[path][method.lower()] = operation
-        
+
     def generate_spec(self) -> Dict:
         """Generate the complete OpenAPI 3.1 specification."""
         return {
@@ -215,16 +220,12 @@ class OpenAPIGenerator:
             "info": {
                 "title": self.info.title,
                 "version": self.info.version,
-                **(
-                    {"description": self.info.description}
-                    if self.info.description
-                    else {}
-                ),
+                **({"description": self.info.description} if self.info.description else {}),
             },
             "paths": self.paths,
             "components": self.components,
         }
-        
+
     def swagger_ui_html(self, spec_url: str = "/openapi.json") -> str:
         """Generate Swagger UI HTML page."""
         return f'''<!DOCTYPE html>
@@ -249,7 +250,7 @@ class OpenAPIGenerator:
     </script>
 </body>
 </html>'''
-    
+
     def redoc_html(self, spec_url: str = "/openapi.json") -> str:
         """Generate ReDoc HTML page."""
         return f'''<!DOCTYPE html>
@@ -293,7 +294,7 @@ def _make_method_decorator(method_name: str) -> Callable[..., Any]:
         def wrapper(fn: F) -> F:
             # Register route with Rust backend
             self._register(method_upper, path, fn)
-            
+
             # Store metadata for OpenAPI generation
             self._add_openapi_metadata(
                 path=path,
@@ -306,7 +307,7 @@ def _make_method_decorator(method_name: str) -> Callable[..., Any]:
                 status_code=status_code,
                 deprecated=deprecated,
             )
-            
+
             return fn
 
         return wrapper
@@ -318,13 +319,13 @@ def _make_method_decorator(method_name: str) -> Callable[..., Any]:
 
 class RustApi(_RustApi):
     """Main application class with Django/FastAPI compatibility.
-    
+
     Example:
         ```python
         from rustapi import RustApi, Depends, Query
-        
+
         app = RustApi(title="My API")
-        
+
         # Dependency injection
         async def get_db():
             db = Database()
@@ -332,7 +333,7 @@ class RustApi(_RustApi):
                 yield db
             finally:
                 await db.close()
-        
+
         # Route with parameters
         @app.get("/users/{user_id}")
         async def get_user(
@@ -341,12 +342,12 @@ class RustApi(_RustApi):
             db: Database = Depends(get_db),
         ):
             return await db.get_user(user_id)
-        
+
         if __name__ == "__main__":
             app.run(host="127.0.0.1", port=8080)
         ```
     """
-    
+
     def __init__(
         self,
         title: str = "API",
@@ -358,7 +359,7 @@ class RustApi(_RustApi):
         dependencies: Optional[List[Depends]] = None,
     ):
         super().__init__()
-        
+
         self.title = title
         self.version = version
         self.description = description
@@ -366,7 +367,7 @@ class RustApi(_RustApi):
         self.redoc_url = redoc_url
         self.openapi_url = openapi_url
         self.dependencies = dependencies or []
-        
+
         # Initialize OpenAPI generator
         self.openapi_info = OpenAPIInfo(
             title=title,
@@ -374,18 +375,18 @@ class RustApi(_RustApi):
             description=description,
         )
         self.openapi_generator = OpenAPIGenerator(self.openapi_info)
-        
+
         # Store route metadata
         self._route_metadata: Dict[str, Dict] = {}
-        
+
         # Auto-register documentation endpoints
         self._setup_docs()
-    
+
     def _setup_docs(self) -> None:
         """Setup automatic documentation endpoints."""
         # These will be registered when routes are added
         pass
-    
+
     def _add_openapi_metadata(
         self,
         path: str,
@@ -400,23 +401,23 @@ class RustApi(_RustApi):
     ) -> None:
         """Store metadata for OpenAPI schema generation."""
         key = f"{method}:{path}"
-        
+
         # Extract parameters from function signature
         sig = inspect.signature(fn)
         parameters = []
-        
+
         for name, param in sig.parameters.items():
             if name == "request":
                 continue
-                
+
             param_type = param.annotation if param.annotation != inspect.Parameter.empty else str
             default = param.default if param.default != inspect.Parameter.empty else ...
-            
+
             # Check if it's a Depends
             if isinstance(default, Depends):
                 # Handle dependency - not included in OpenAPI params
                 continue
-            
+
             # Determine parameter location
             if "{" + name + "}" in path:
                 param_in = "path"
@@ -428,18 +429,22 @@ class RustApi(_RustApi):
                     Header: "header",
                     Cookie: "cookie",
                 }.get(type(default), "query")
-                required = default is ... or (hasattr(default, 'default') and default.default is ...)
+                required = default is ... or (
+                    hasattr(default, "default") and default.default is ...
+                )
             else:
                 param_in = "query"
                 required = default is ...
-            
-            parameters.append({
-                "name": name,
-                "in": param_in,
-                "required": required,
-                "schema": {"type": self._type_to_schema(param_type)},
-            })
-        
+
+            parameters.append(
+                {
+                    "name": name,
+                    "in": param_in,
+                    "required": required,
+                    "schema": {"type": self._type_to_schema(param_type)},
+                }
+            )
+
         operation = {
             "operationId": f"{method.lower()}_{path.replace('/', '_').replace('{', '').replace('}', '')}",
             "parameters": parameters,
@@ -452,39 +457,39 @@ class RustApi(_RustApi):
             "summary": summary or fn.__doc__ or "",
             "deprecated": deprecated or False,
         }
-        
+
         self.openapi_generator.add_route(path, method, operation)
-    
+
     def _type_to_schema(self, type_hint: Any) -> str:
         """Convert Python type to JSON Schema type."""
-        if type_hint == int:
+        if type_hint is int:
             return "integer"
-        elif type_hint == float:
+        elif type_hint is float:
             return "number"
-        elif type_hint == bool:
+        elif type_hint is bool:
             return "boolean"
-        elif type_hint == str:
+        elif type_hint is str:
             return "string"
-        elif type_hint == list or type_hint == List:
+        elif type_hint is list or type_hint is List:
             return "array"
-        elif type_hint == dict or type_hint == Dict:
+        elif type_hint is dict or type_hint is Dict:
             return "object"
         else:
             return "string"
-    
+
     def get_openapi_spec(self) -> Dict:
         """Get the complete OpenAPI specification."""
         return self.openapi_generator.generate_spec()
-    
+
     def openapi_json_response(self) -> Response:
         """Return OpenAPI spec as JSON response."""
         return JsonResponse(self.get_openapi_spec())
-    
+
     def swagger_ui_response(self) -> Response:
         """Return Swagger UI HTML page."""
         html = self.openapi_generator.swagger_ui_html(self.openapi_url)
         return TextResponse(html, headers={"content-type": "text/html"})
-    
+
     def redoc_response(self) -> Response:
         """Return ReDoc HTML page."""
         html = self.openapi_generator.redoc_html(self.openapi_url)
@@ -506,21 +511,23 @@ def run(app: RustApi, host: str = "127.0.0.1", port: int = 8080) -> None:
 # ORM Exports (Phase 2)
 # ============================================================================
 
+
 class ModelMetaclass(type):
     """Metaclass for ORM models."""
+
     pass
 
 
 class QuerySet:
     """Django-style queryset for database queries."""
-    
+
     def __init__(self, model_class: type):
         self.model_class = model_class
         self._filters: List[Dict] = []
         self._order_by: List[str] = []
         self._limit: Optional[int] = None
         self._offset: Optional[int] = None
-    
+
     def filter(self, **kwargs) -> "QuerySet":
         """Add WHERE conditions."""
         qs = self.__class__(self.model_class)
@@ -529,7 +536,7 @@ class QuerySet:
         qs._limit = self._limit
         qs._offset = self._offset
         return qs
-    
+
     def exclude(self, **kwargs) -> "QuerySet":
         """Add NOT conditions."""
         qs = self.__class__(self.model_class)
@@ -538,7 +545,7 @@ class QuerySet:
         qs._limit = self._limit
         qs._offset = self._offset
         return qs
-    
+
     def order_by(self, *fields) -> "QuerySet":
         """Add ORDER BY clause. Prefix with '-' for descending."""
         qs = self.__class__(self.model_class)
@@ -547,7 +554,7 @@ class QuerySet:
         qs._limit = self._limit
         qs._offset = self._offset
         return qs
-    
+
     def limit(self, n: int) -> "QuerySet":
         """Set LIMIT clause."""
         qs = self.__class__(self.model_class)
@@ -556,7 +563,7 @@ class QuerySet:
         qs._limit = n
         qs._offset = self._offset
         return qs
-    
+
     def offset(self, n: int) -> "QuerySet":
         """Set OFFSET clause."""
         qs = self.__class__(self.model_class)
@@ -565,21 +572,21 @@ class QuerySet:
         qs._limit = self._limit
         qs._offset = n
         return qs
-    
+
     async def all(self) -> List[Any]:
         """Execute query and return all results."""
         # Delegate to Rust backend for actual execution
         raise NotImplementedError("ORM execution requires database setup")
-    
+
     async def first(self) -> Optional[Any]:
         """Execute query and return first result or None."""
         results = await self.limit(1).all()
         return results[0] if results else None
-    
+
     async def count(self) -> int:
         """Count matching records."""
         raise NotImplementedError()
-    
+
     async def delete(self) -> int:
         """Delete matching records. Returns count deleted."""
         raise NotImplementedError()
@@ -587,31 +594,31 @@ class QuerySet:
 
 class Model(metaclass=ModelMetaclass):
     """Base class for ORM models - Django-style.
-    
+
     Example:
         class User(Model):
             id: int
             username: str
             email: str
             created_at: datetime
-        
+
         # Query users
         users = await User.objects.filter(email__endswith="@example.com").order_by("-id").limit(10).all()
-        
+
         # Get single user
         user = await User.objects.filter(id=1).first()
     """
-    
+
     objects: QuerySet
-    
+
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         cls.objects = QuerySet(cls)
-    
+
     async def save(self) -> None:
         """Save this instance to the database."""
         raise NotImplementedError()
-    
+
     async def delete(self) -> None:
         """Delete this instance from the database."""
         raise NotImplementedError()
@@ -621,16 +628,17 @@ class Model(metaclass=ModelMetaclass):
 # Migration System
 # ============================================================================
 
+
 class Migration:
     """Base class for database migrations."""
-    
+
     name: str = ""
     dependencies: List[str] = []
-    
+
     async def apply(self, database: Any) -> None:
         """Apply this migration."""
         raise NotImplementedError()
-    
+
     async def rollback(self, database: Any) -> None:
         """Rollback this migration."""
         raise NotImplementedError()
@@ -638,19 +646,19 @@ class Migration:
 
 class Migrator:
     """Database migration runner."""
-    
+
     def __init__(self, database_url: str):
         self.database_url = database_url
         self.migrations: List[Migration] = []
-    
+
     def add_migration(self, migration: Migration) -> None:
         """Register a migration."""
         self.migrations.append(migration)
-    
+
     async def run(self) -> None:
         """Run all pending migrations."""
         raise NotImplementedError()
-    
+
     async def rollback(self, steps: int = 1) -> None:
         """Rollback migrations."""
         raise NotImplementedError()

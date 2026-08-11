@@ -1,69 +1,27 @@
-# Rust
-/target
-**/target
+```
+# Rust/Cargo
+target/
+Cargo.lock
 **/*.rs.bk
-Cargo.lock.bak
 
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
+*.pyc
+*.pyo
+*.pyd
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual environments
-.venv
-venv
 env/
-ENV/
-
-# IDEs
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Testing
-.pytest_cache/
+venv/
+.venv/
+.ENV
+.ENV.*
+.venv.bak/
+.conda/
 .mypy_cache/
-.ruff_cache/
+.pytest_cache/
 .coverage
 htmlcov/
-.tox/
-.nox/
-coverage.xml
-*.cover
-
-# Build artifacts
-*.whl
-*.tar.gz
-dist/
-build/
-
-# OS
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
+.coverage.*
 
 # Logs
 *.log
@@ -71,16 +29,25 @@ $RECYCLE.BIN/
 # Environment
 .env
 .env.local
-.env.*.local
+.env.*
+.env.local.*
 
-# Per-test scratch files
-tests/_launcher.py
-tests/_perf_app.py
-tests/_perf_async_app.py
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Databases
-*.db
-*.sqlite
-*.sqlite3
+# OS
+.DS_Store
+Thumbs.db
 
-PUBLISHING.md
+# Build artifacts
+dist/
+build/
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+```

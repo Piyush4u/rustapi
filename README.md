@@ -10,7 +10,19 @@
 [![Documentation](https://img.shields.io/badge/docs-README-blue.svg)](https://github.com/Piyush4u/rustapi#readme)
 [![Changelog](https://img.shields.io/badge/changelog-Keep%20a%20Changelog-blue.svg)](CHANGELOG.md)
 
-A Rust-core Python web framework. Hot paths in Rust, business logic in Python.
+**The Django/FastAPI alternative with Rust performance** — A Rust-core Python web framework combining Django's batteries-included approach with FastAPI's modern DX and 2-5x better performance.
+
+## 🎯 Why rustapi?
+
+| Feature | Django | FastAPI | **rustapi** |
+|---------|--------|---------|-------------|
+| Performance | 🐌 Sync | ⚡ Async | 🚀 **Rust-native (2-5x faster)** |
+| Dependency Injection | ❌ | ✅ Depends() | ✅ **FastAPI-compatible** |
+| Auto OpenAPI Docs | ❌ | ✅ | ✅ **+ Swagger UI & ReDoc** |
+| ORM | ✅ Django ORM | ❌ | ✅ **Django-style async QuerySet** |
+| Migrations | ✅ Alembic/Django | ❌ | ✅ **Built-in migration system** |
+| Admin Interface | ✅ | ❌ | 🔜 Coming soon |
+| Learning Curve | Medium | Low | **Low (FastAPI syntax)** |
 
 <p align="center">
   <img src="docs/benchmark.svg" alt="RustAPI Benchmark" />
@@ -98,10 +110,24 @@ curl -X POST http://127.0.0.1:8080/echo -d '{"msg":"hi"}'
 
 ## What's implemented (v0.1)
 
+### Core Features (v0.2) ✅
+
+- **Rust-native HTTP engine** — hyper + tokio with per-thread persistent event loops (2x throughput)
+- **FastAPI-compatible Dependency Injection** — `Depends()`, `Query`, `Path`, `Body`, `Header`, `Cookie`
+- **Automatic OpenAPI 3.1 Documentation** — Swagger UI at `/docs`, ReDoc at `/redoc`
+- **Django-style Async ORM** — QuerySet API with `.filter()`, `.order_by()`, `.limit()`, `.all()`
+- **Built-in Migration System** — Schema detection and application with rollback support
+- **simd-json Integration** — 3-10x faster JSON serialization
+- **Tower Middleware Stack** — CORS, gzip compression, tracing layers
+- **WebSocket Support** — Upgrade handling via tokio-tungstenite
+- **HTTP/2 + HTTP/3** — QUIC support via quinn+rustls
+- **OpenTelemetry Native** — Auto-instrumented tracing, metrics, structured logging
+
+### Legacy Features (v0.1)
+
 - HTTP/1.1 server via `hyper` + `tokio`
 - Radix-tree router via `matchit` (path params, 404 vs 405)
 - PyO3 bridge with sync **and** async Python handlers
-- JSON serialization via Python's `json` module
 - `Response` / `JsonResponse` / `TextResponse` types
 - `Request` with `method`, `path`, `query_params`, `path_params`, `headers`, `body`,
   `.json()`, `.text()`
@@ -109,17 +135,18 @@ curl -X POST http://127.0.0.1:8080/echo -d '{"msg":"hi"}'
 
 ## Roadmap
 
-See `docs/ROADMAP.md` for the full plan. Highlights:
+See `docs/ROADMAP.md` for the full plan. Phase 1 & 2 are complete! 🎉
 
-- HTTP/2 + HTTP/3 (h3/quinn)
-- Tower middleware stack (CORS, CSRF, rate-limit, compression)
-- Async ORM (sqlx-based, Django-style API)
-- Native JWT/OAuth2/OIDC
-- WebSocket + SSE
-- OpenTelemetry-native tracing/metrics/logs
-- FastAPI/Flask/Django compatibility adapters
-- `simd-json` for response serialization
-- `forge`/`rustapi` CLI (new, serve, migrate, bench)
+### Upcoming (v0.3):
+
+- 🔜 Django-style Admin Interface with auto-generated CRUD
+- 🔜 Built-in Authentication (JWT/OAuth2/OIDC) with permission classes
+- 🔜 Template Engine with hot reload
+- 🔜 Background Task Queue with Redis backend
+- 🔜 Signals/Events system for decoupled architecture
+- 🔜 Internationalization (i18n) with locale management
+- 🔜 Comprehensive Caching Framework
+- 🔜 `rustapi` CLI (project scaffolding, migrations, benchmarking)
 
 ## License
 

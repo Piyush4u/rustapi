@@ -1,7 +1,8 @@
 """Example demonstrating Phase 1 & 2 features: Dependency Injection, OpenAPI, and ORM."""
 
-from rustapi import RustApi, Depends, Query, Path, Body, Model, JsonResponse, TextResponse
 from typing import Optional
+
+from rustapi import Body, Depends, Model, Path, Query, RustApi
 
 # =============================================================================
 # Initialize app with automatic OpenAPI documentation
@@ -16,22 +17,23 @@ app = RustApi(
 # Phase 1: Dependency Injection (FastAPI-compatible)
 # =============================================================================
 
+
 # Simulated database connection pool
 class Database:
     def __init__(self):
         self.connected = False
-    
+
     async def connect(self):
         self.connected = True
         print("Database connected")
-    
+
     async def disconnect(self):
         self.connected = False
         print("Database disconnected")
-    
+
     async def get_user(self, user_id: int) -> dict:
         return {"id": user_id, "name": f"User {user_id}", "email": f"user{user_id}@example.com"}
-    
+
     async def create_user(self, name: str, email: str) -> dict:
         return {"id": 42, "name": name, "email": email}
 
@@ -60,6 +62,7 @@ async def get_current_user(token: str = Header(None)) -> Optional[dict]:
 # Phase 1: Routes with Dependency Injection
 # =============================================================================
 
+
 @app.get("/")
 async def root():
     """Root endpoint - returns welcome message."""
@@ -72,7 +75,7 @@ async def get_user(
     db: Database = Depends(get_db),
 ):
     """Get a specific user by ID.
-    
+
     - **user_id**: The unique identifier of the user
     - Returns user data or 404
     """
@@ -87,7 +90,7 @@ async def list_users(
     db: Database = Depends(get_db),
 ):
     """List all users with pagination.
-    
+
     - **skip**: Number of records to skip (pagination)
     - **limit**: Maximum records to return (max 100)
     """
@@ -106,16 +109,16 @@ async def create_user(
     db: Database = Depends(get_db),
 ):
     """Create a new user.
-    
+
     - **name**: User's full name (required)
     - **email**: User's email address (required)
     """
     name = user_data.get("name")
     email = user_data.get("email")
-    
+
     if not name or not email:
         return {"error": "name and email are required"}, 400
-    
+
     user = await db.create_user(name, email)
     return user, 201
 
@@ -123,6 +126,7 @@ async def create_user(
 # =============================================================================
 # Phase 1: Automatic OpenAPI Documentation Endpoints
 # =============================================================================
+
 
 @app.get(app.openapi_url)
 async def openapi_json():
@@ -146,8 +150,10 @@ async def redoc():
 # Phase 2: Django-style ORM Models
 # =============================================================================
 
+
 class User(Model):
     """User model with Django-style ORM."""
+
     id: int
     username: str
     email: str
@@ -160,24 +166,24 @@ class User(Model):
 async def list_users_orm():
     """Demonstrate Django-style ORM queries."""
     # These would execute against real database:
-    
+
     # Get all active users ordered by creation date
     # users = await User.objects.filter(is_active=True).order_by("-created_at").all()
-    
+
     # Get first user matching criteria
     # user = await User.objects.filter(email__endswith="@example.com").first()
-    
+
     # Count users
     # count = await User.objects.filter(is_active=True).count()
-    
+
     # Pagination
     # page = await User.objects.all().offset(20).limit(10).all()
-    
+
     return {
         "message": "ORM queries demonstrated in code comments",
         "features": [
             ".filter(**kwargs) - WHERE conditions",
-            ".exclude(**kwargs) - NOT conditions", 
+            ".exclude(**kwargs) - NOT conditions",
             ".order_by(*fields) - ORDER BY (prefix with - for DESC)",
             ".limit(n) - LIMIT clause",
             ".offset(n) - OFFSET clause",
@@ -185,7 +191,7 @@ async def list_users_orm():
             ".first() - Execute and return first result",
             ".count() - Count matching records",
             ".delete() - Delete matching records",
-        ]
+        ],
     }
 
 
@@ -193,10 +199,12 @@ async def list_users_orm():
 # Phase 2: Migrations
 # =============================================================================
 
+
 class CreateUserTable(Migration):
     """Migration to create users table."""
+
     name = "001_create_users"
-    
+
     async def apply(self, database):
         """Create the users table."""
         await database.execute("""
@@ -208,7 +216,7 @@ class CreateUserTable(Migration):
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-    
+
     async def rollback(self, database):
         """Drop the users table."""
         await database.execute("DROP TABLE IF EXISTS users")
@@ -216,12 +224,13 @@ class CreateUserTable(Migration):
 
 class AddUserIndex(Migration):
     """Migration to add index on email."""
+
     name = "002_add_email_index"
     dependencies = ["001_create_users"]
-    
+
     async def apply(self, database):
         await database.execute("CREATE INDEX idx_users_email ON users(email)")
-    
+
     async def rollback(self, database):
         await database.execute("DROP INDEX IF EXISTS idx_users_email")
 
@@ -255,17 +264,17 @@ if __name__ == "__main__":
     print("=" * 60)
     print("rustapi - Django/FastAPI compatible with Rust performance")
     print("=" * 60)
-    print(f"\n📖 API Documentation:")
-    print(f"   Swagger UI: http://127.0.0.1:8080/docs")
-    print(f"   ReDoc:      http://127.0.0.1:8080/redoc")
-    print(f"   OpenAPI:    http://127.0.0.1:8080/openapi.json")
-    print(f"\n🚀 Features demonstrated:")
-    print(f"   ✅ FastAPI-compatible Depends() injection")
-    print(f"   ✅ Automatic OpenAPI 3.1 schema generation")
-    print(f"   ✅ Swagger UI & ReDoc documentation")
-    print(f"   ✅ Django-style ORM with QuerySet")
-    print(f"   ✅ Migration system")
-    print(f"   ✅ Path/Query/Body/Header parameter validation")
+    print("\n📖 API Documentation:")
+    print("   Swagger UI: http://127.0.0.1:8080/docs")
+    print("   ReDoc:      http://127.0.0.1:8080/redoc")
+    print("   OpenAPI:    http://127.0.0.1:8080/openapi.json")
+    print("\n🚀 Features demonstrated:")
+    print("   ✅ FastAPI-compatible Depends() injection")
+    print("   ✅ Automatic OpenAPI 3.1 schema generation")
+    print("   ✅ Swagger UI & ReDoc documentation")
+    print("   ✅ Django-style ORM with QuerySet")
+    print("   ✅ Migration system")
+    print("   ✅ Path/Query/Body/Header parameter validation")
     print(f"\n{'=' * 60}\n")
-    
+
     run(app, host="127.0.0.1", port=8080)
